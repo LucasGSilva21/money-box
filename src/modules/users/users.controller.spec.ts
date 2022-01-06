@@ -43,6 +43,13 @@ describe('UsersController', () => {
     });
   });
 
+  describe('Find All', () => {
+    it('should return a void list', async () => {
+      const users = await controller.findAll();
+      expect(users).toEqual([]);
+    });
+  });
+
   afterAll(async () => {
     await closeInMongodConnection();
   });
