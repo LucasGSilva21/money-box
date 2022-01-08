@@ -1,7 +1,7 @@
 
 version: "3"
 services:
-  back_app:
+  app:
     depends_on:
       - db
     restart: always
@@ -9,7 +9,7 @@ services:
     ports:
       - "3333:3333"
     environment:
-      - DB_URL=mongodb://db_mongo
+      - MONGO_URL=mongodb://db_mongo
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
