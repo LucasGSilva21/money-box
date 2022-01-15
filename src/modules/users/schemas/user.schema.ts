@@ -21,7 +21,6 @@ export class User {
     required: true,
     minlength: 6,
     maxlength: 255,
-    select: false,
   })
   password: string;
 }
