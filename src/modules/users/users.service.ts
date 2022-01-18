@@ -15,12 +15,12 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const { name, email, password } = createUserDto;
 
-    const hashPassowrd = await bcrypt.hash(password, 10);
+    const hashPassword = await bcrypt.hash(password, 10);
 
     const createdUser = await this.userModel.create({
       name,
       email,
-      password: hashPassowrd,
+      password: hashPassword,
     });
 
     createdUser.password = null;
@@ -34,6 +34,10 @@ export class UsersService {
 
   async findOne(id: string) {
     return this.userModel.findById(id).exec();
+  }
+
+  async findByEmail(email: string) {
+    return this.userModel.findOne({ email }).exec();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
