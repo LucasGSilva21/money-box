@@ -1,27 +1,21 @@
-
-version: "3"
+version: '3'
 
 services:
   app:
     build: .
-    container_name: app
+    entrypoint: .docker/entrypoint.sh
     ports:
       - 3333:3333
-    environment:
-      - MONGO_URL=mongodb://db_mongo
     volumes:
-      - .:/home/node/app
+      - ./:/home/node/app
     depends_on:
       - db
-    tty: true
-      
+  
   db:
-    image: mongo
-    container_name: db_mongo
+    image: mongo:4.4.4
+    restart: always
     volumes:
-      - mongodata:/data/db
-    ports:
-      - 27017:27017
-
-volumes:
-  mongodata: 
+      - ./.docker/dbdata:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
