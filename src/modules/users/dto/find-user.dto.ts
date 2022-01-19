@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsEmail,
   IsMongoId,
+  IsDate,
 } from 'class-validator';
 import { Exclude, Expose } from 'class-transformer';
 
@@ -26,4 +27,12 @@ export class FindUserDto {
   @MaxLength(60)
   @IsNotEmpty()
   email: string;
+
+  @Expose()
+  @IsDate()
+  createdAt: Date;
+
+  @Expose()
+  @IsDate()
+  updatedAt: Date;
 }
