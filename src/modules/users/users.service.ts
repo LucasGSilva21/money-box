@@ -28,8 +28,10 @@ export class UsersService {
     return createdUser;
   }
 
-  async findAll() {
-    return this.userModel.find().exec();
+  async findAll(): Promise<FindUserDto[]> {
+    const users = await this.userModel.find().exec();
+
+    return users.map((user) => plainToClass(FindUserDto, user));
   }
 
   async findOne(id: string): Promise<FindUserDto> {
