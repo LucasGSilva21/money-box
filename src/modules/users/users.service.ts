@@ -12,7 +12,7 @@ export class UsersService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<FindUserDto> {
     const { name, email, password } = createUserDto;
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -23,9 +23,7 @@ export class UsersService {
       password: hashPassword,
     });
 
-    createdUser.password = null;
-
-    return createdUser;
+    return plainToClass(FindUserDto, createdUser);
   }
 
   async findAll(): Promise<FindUserDto[]> {
