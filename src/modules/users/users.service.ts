@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -44,11 +44,28 @@ export class UsersService {
     return plainToClass(FindUserDto, user);
   }
 
-  async findByEmail(email: string): Promise<UserDocument> {
+  async findByEmail(email: string, id?: string): Promise<UserDocument> {
+    if (id) {
+      return this.userModel.findOne({ email, _id: { $ne: id } }).exec();
+    }
     return this.userModel.findOne({ email }).exec();
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<FindUserDto> {
+    const user = await this.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    const { email } = updateUserDto;
+
+    const emailExists = await this.findByEmail(email, id);
+
+    if (emailExists) {
+      throw new ConflictException(undefined, 'This email already exists');
+    }
+
     await this.userModel.updateOne({ _id: id }, updateUserDto).exec();
 
     return this.findOne(id);
