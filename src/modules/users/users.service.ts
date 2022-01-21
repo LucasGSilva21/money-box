@@ -41,6 +41,10 @@ export class UsersService {
   async findOne(id: string): Promise<FindUserDto> {
     const user = await this.userModel.findById(id).exec();
 
+    if (!user) {
+      throw new NotFoundException();
+    }
+
     return plainToClass(FindUserDto, user);
   }
 
@@ -52,11 +56,7 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<FindUserDto> {
-    const user = await this.findOne(id);
-
-    if (!user) {
-      throw new NotFoundException();
-    }
+    await this.findOne(id);
 
     const { email } = updateUserDto;
 
@@ -72,6 +72,8 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<void> {
+    await this.findOne(id);
+
     await this.userModel.deleteOne({ _id: id }).exec();
   }
 }
