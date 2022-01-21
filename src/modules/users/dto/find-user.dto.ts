@@ -4,16 +4,15 @@ import {
   MaxLength,
   IsNotEmpty,
   IsEmail,
-  IsMongoId,
   IsDate,
 } from 'class-validator';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 
 @Exclude()
 export class FindUserDto {
   @Expose()
-  @IsMongoId()
-  _id: string;
+  @Transform((value) => value.obj._id.toString(), { toClassOnly: true })
+  id: string;
 
   @Expose()
   @IsString()
