@@ -36,10 +36,10 @@ export class UsersService {
     return plainToClass(FindUserDto, createdUser);
   }
 
-  async findAll(): Promise<FindUserDto[]> {
+  async findAll<UserDTO>(userDTO: UserDTO): Promise<UserDTO[]> {
     const users = await this.userModel.find().exec();
 
-    return users.map((user) => plainToClass(FindUserDto, user));
+    return users.map((user) => plainToClass(userDTO as any, user));
   }
 
   async findOne<UserDTO>(
