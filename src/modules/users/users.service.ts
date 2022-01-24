@@ -22,7 +22,7 @@ export class UsersService {
     const user = await this.userModel.findOne({ email }).exec();
 
     if (user) {
-      throw new ConflictException(undefined, 'This email already exists');
+      throw new ConflictException('This email already exists');
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -69,7 +69,7 @@ export class UsersService {
       .exec();
 
     if (emailExists) {
-      throw new ConflictException(undefined, 'This email already exists');
+      throw new ConflictException('This email already exists');
     }
 
     await this.userModel.updateOne({ _id: id }, updateUserDto).exec();
