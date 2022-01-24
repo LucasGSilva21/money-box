@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDto, UpdatePasswordDto } from './dto';
+import { UserDocument } from '../users/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -12,13 +13,19 @@ export class AuthService {
   ) {}
 
   private async validateUser(userMail: string, userPassword: string) {
-    const user = await this.usersService.findByEmail(userMail);
+    try {
+      const user = (await this.usersService.findOne({
+        email: userMail,
+      })) as UserDocument;
 
-    if (!user || !(await bcrypt.compare(userPassword, user.password))) {
+      if (!(await bcrypt.compare(userPassword, user.password))) {
+        throw new UnauthorizedException();
+      }
+
+      return user;
+    } catch (err) {
       throw new UnauthorizedException();
     }
-
-    return user;
   }
 
   async login(loginDto: LoginDto) {
@@ -37,7 +44,7 @@ export class AuthService {
   }
 
   async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
-    const { password } = await this.usersService.findOne(id);
+    const { password } = await this.usersService.findOne({ _id: id });
 
     if (!(await bcrypt.compare(updatePasswordDto.oldPassword, password))) {
       throw new UnauthorizedException();

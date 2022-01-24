@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, FilterQuery } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto, FindUserDto, UpdateUserDto } from './dto';
 import * as bcrypt from 'bcrypt';
@@ -19,7 +19,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<FindUserDto> {
     const { name, email, password } = createUserDto;
 
-    const user = await this.findByEmail(email);
+    const user = await this.userModel.findOne({ email }).exec();
 
     if (user) {
       throw new ConflictException(undefined, 'This email already exists');
@@ -43,10 +43,10 @@ export class UsersService {
   }
 
   async findOne<UserDTO>(
-    id: string,
+    conditions: FilterQuery<User>,
     userDTO?: UserDTO,
   ): Promise<UserDocument | UserDTO> {
-    const user = await this.userModel.findById(id).exec();
+    const user = await this.userModel.findOne(conditions).exec();
 
     if (!user) {
       throw new NotFoundException();
@@ -59,19 +59,14 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string, id?: string): Promise<UserDocument> {
-    if (id) {
-      return this.userModel.findOne({ email, _id: { $ne: id } }).exec();
-    }
-    return this.userModel.findOne({ email }).exec();
-  }
-
   async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
-    await this.findOne(id);
+    await this.findOne({ _id: id });
 
     const { email } = updateUserDto;
 
-    const emailExists = await this.findByEmail(email, id);
+    const emailExists = await this.userModel
+      .findOne({ email, _id: { $ne: id } })
+      .exec();
 
     if (emailExists) {
       throw new ConflictException(undefined, 'This email already exists');
@@ -79,17 +74,17 @@ export class UsersService {
 
     await this.userModel.updateOne({ _id: id }, updateUserDto).exec();
 
-    return this.findOne(id);
+    return this.findOne({ _id: id });
   }
 
   async updatePassword(id: string, password: string): Promise<void> {
-    await this.findOne(id);
+    await this.findOne({ _id: id });
 
     await this.userModel.updateOne({ _id: id }, { password }).exec();
   }
 
   async remove(id: string): Promise<void> {
-    await this.findOne(id);
+    await this.findOne({ _id: id });
 
     await this.userModel.deleteOne({ _id: id }).exec();
   }
