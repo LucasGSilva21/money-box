@@ -15,7 +15,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
- 
+
   async create(createUserDto: CreateUserDto): Promise<FindUserDto> {
     const { name, email, password } = createUserDto;
 
@@ -42,14 +42,21 @@ export class UsersService {
     return users.map((user) => plainToClass(FindUserDto, user));
   }
 
-  async findOne(id: string): Promise<FindUserDto> {
+  async findOne<UserDTO>(
+    id: string,
+    userDTO?: UserDTO,
+  ): Promise<UserDocument | UserDTO> {
     const user = await this.userModel.findById(id).exec();
 
     if (!user) {
       throw new NotFoundException();
     }
 
-    return plainToClass(FindUserDto, user);
+    if (userDTO) {
+      return plainToClass(userDTO as any, user);
+    }
+
+    return user;
   }
 
   async findByEmail(email: string, id?: string): Promise<UserDocument> {
@@ -63,7 +70,7 @@ export class UsersService {
     return this.userModel.findById(id).exec();
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<FindUserDto> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
     await this.findOne(id);
 
     const { email } = updateUserDto;

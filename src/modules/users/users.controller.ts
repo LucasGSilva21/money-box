@@ -11,8 +11,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto, UpdateUserDto, FindUserDto } from './dto';
 
 @Controller('users')
 export class UsersController {
@@ -36,7 +35,7 @@ export class UsersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+    return this.usersService.findOne(id, FindUserDto);
   }
 
   @Put(':id')
