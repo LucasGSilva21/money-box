@@ -37,12 +37,9 @@ export class AuthService {
   }
 
   async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
-    const user = await this.usersService.findById(id);
+    const { password } = await this.usersService.findOne(id);
 
-    if (
-      !user ||
-      !(await bcrypt.compare(updatePasswordDto.oldPassword, user.password))
-    ) {
+    if (!(await bcrypt.compare(updatePasswordDto.oldPassword, password))) {
       throw new UnauthorizedException();
     }
 
