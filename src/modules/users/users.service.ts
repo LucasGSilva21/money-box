@@ -15,7 +15,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
-
+ 
   async create(createUserDto: CreateUserDto): Promise<FindUserDto> {
     const { name, email, password } = createUserDto;
 
@@ -59,6 +59,10 @@ export class UsersService {
     return this.userModel.findOne({ email }).exec();
   }
 
+  async findById(id: string): Promise<UserDocument> {
+    return this.userModel.findById(id).exec();
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<FindUserDto> {
     await this.findOne(id);
 
@@ -73,6 +77,12 @@ export class UsersService {
     await this.userModel.updateOne({ _id: id }, updateUserDto).exec();
 
     return this.findOne(id);
+  }
+
+  async updatePassword(id: string, password: string): Promise<void> {
+    await this.findOne(id);
+
+    await this.userModel.updateOne({ _id: id }, { password }).exec();
   }
 
   async remove(id: string): Promise<void> {

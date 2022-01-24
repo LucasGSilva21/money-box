@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
-import { LoginDto } from './dto';
+import { LoginDto, UpdatePasswordDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -34,5 +34,18 @@ export class AuthService {
       },
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const user = await this.usersService.findById(id);
+
+    if (
+      !user ||
+      !(await bcrypt.compare(updatePasswordDto.oldPassword, user.password))
+    ) {
+      throw new UnauthorizedException();
+    }
+
+    await this.usersService.updatePassword(id, updatePasswordDto.newPassword);
   }
 }
