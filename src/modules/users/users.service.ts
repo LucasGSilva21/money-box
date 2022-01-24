@@ -84,8 +84,6 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.findOne({ _id: id });
-
-    await this.userModel.deleteOne({ _id: id }).exec();
+    await this.userModel.findOneAndRemove({ _id: id }).exec();
   }
 }
