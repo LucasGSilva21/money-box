@@ -13,6 +13,7 @@ export const rootMongooseTestModule = (options: MongooseModuleOptions = {}) =>
         ...options,
       };
     },
+    imports: undefined,
   });
 
 export const closeInMongodConnection = async () => {
