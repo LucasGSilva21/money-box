@@ -37,7 +37,7 @@ describe('UsersController', () => {
         email: 'valid_email@mail.com',
         password: 'valid_password',
       });
-      expect(user).toHaveProperty('_id');
+      expect(user).toHaveProperty('id');
       expect(user.name).toEqual('valid_name');
       expect(user.email).toEqual('valid_email@mail.com');
     });
