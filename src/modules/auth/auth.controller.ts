@@ -14,6 +14,7 @@ import { CreateUserDto, FindUserDto } from '../users/dto';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { plainToClass } from 'class-transformer';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -48,7 +49,8 @@ export class AuthController {
     type: FindUserDto,
   })
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    const user = this.usersService.create(createUserDto);
+    return plainToClass(FindUserDto, user);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -8,10 +8,12 @@ import {
   UsePipes,
   ValidationPipe,
   HttpCode,
+  NotFoundException,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto, FindUserDto } from './dto';
-import { ApiTags } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 
 @Controller('users')
 @ApiTags('users')
@@ -19,13 +21,18 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  findAll() {
-    return this.usersService.findAll(FindUserDto);
+  async findAll(): Promise<FindUserDto[]> {
+    const users = await this.usersService.findAll();
+    return users.map((user) => plainToClass(FindUserDto, user));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne({ _id: id }, FindUserDto);
+  async findOne(@Param('id') id: string): Promise<FindUserDto> {
+    const user = this.usersService.findOne({ _id: id });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return plainToClass(FindUserDto, user);
   }
 
   @Put(':id')
@@ -35,13 +42,17 @@ export class UsersController {
       forbidNonWhitelisted: true,
     }),
   )
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<FindUserDto> {
+    const user = this.usersService.update(id, updateUserDto);
+    return plainToClass(FindUserDto, user);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<void> {
     this.usersService.remove(id);
   }
 }

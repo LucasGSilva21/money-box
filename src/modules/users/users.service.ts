@@ -1,14 +1,9 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
-import { CreateUserDto, FindUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import * as bcrypt from 'bcrypt';
-import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +11,7 @@ export class UsersService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<FindUserDto> {
+  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const { name, email, password } = createUserDto;
 
     const user = await this.userModel.findOne({ email }).exec();
@@ -27,39 +22,25 @@ export class UsersService {
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    const createdUser = await this.userModel.create({
+    return this.userModel.create({
       name,
       email,
       password: hashPassword,
     });
-
-    return plainToClass(FindUserDto, createdUser);
   }
 
-  async findAll<UserDTO>(userDTO: UserDTO): Promise<UserDTO[]> {
-    const users = await this.userModel.find().exec();
-
-    return users.map((user) => plainToClass(userDTO as any, user));
+  async findAll(): Promise<UserDocument[]> {
+    return this.userModel.find().exec();
   }
 
-  async findOne<UserDTO>(
-    conditions: FilterQuery<User>,
-    userDTO?: UserDTO,
-  ): Promise<UserDocument | UserDTO> {
-    const user = await this.userModel.findOne(conditions).exec();
-
-    if (!user) {
-      throw new NotFoundException();
-    }
-
-    if (userDTO) {
-      return plainToClass(userDTO as any, user);
-    }
-
-    return user;
+  async findOne(conditions: FilterQuery<User>): Promise<UserDocument | null> {
+    return this.userModel.findOne(conditions).exec();
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserDocument> {
     await this.findOne({ _id: id });
 
     const { email } = updateUserDto;
