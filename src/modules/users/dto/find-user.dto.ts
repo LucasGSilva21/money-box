@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   MinLength,
@@ -11,10 +12,12 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 
 @Exclude()
 export class FindUserDto {
+  @ApiProperty()
   @Expose()
   @Transform((value) => value.obj._id.toString(), { toClassOnly: true })
   id: string;
 
+  @ApiProperty()
   @Expose()
   @IsString()
   @MinLength(3)
@@ -22,17 +25,20 @@ export class FindUserDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty()
   @Expose()
   @IsEmail()
   @MaxLength(60)
   @IsNotEmpty()
   email: string;
 
+  @ApiProperty({ required: false })
   @Expose()
   @IsDate()
   @IsOptional()
   createdAt?: Date;
 
+  @ApiProperty({ required: false })
   @Expose()
   @IsDate()
   @IsOptional()
