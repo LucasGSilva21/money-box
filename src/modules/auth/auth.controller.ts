@@ -6,6 +6,7 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginPayloadDto } from './dto';
@@ -25,6 +26,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @HttpCode(200)
   @UsePipes(
     new ValidationPipe({
       whitelist: true,
