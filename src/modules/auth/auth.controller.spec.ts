@@ -40,6 +40,19 @@ describe('AuthController', () => {
     await closeInMongodConnection();
   });
 
+  describe('Register', () => {
+    it('should return an user when send correct values', async () => {
+      const user = await controller.register({
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      });
+      expect(user).toHaveProperty('id');
+      expect(user.name).toEqual('valid_name');
+      expect(user.email).toEqual('valid_email@mail.com');
+    });
+  });
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
