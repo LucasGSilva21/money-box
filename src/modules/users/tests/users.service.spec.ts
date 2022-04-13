@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsersService } from './users.service';
-import { User, UserSchema } from './schemas/user.schema';
+import { UsersService } from '../users.service';
+import { User, UserSchema } from '../schemas/user.schema';
 import {
   rootMongooseTestModule,
   closeInMongodConnection,
-} from '../../common/helpers/mongoose-test-module';
+} from '../../../common/helpers/mongoose-test-module';
 
 describe('UsersService', () => {
   let service: UsersService;
