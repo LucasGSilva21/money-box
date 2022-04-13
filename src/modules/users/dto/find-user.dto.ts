@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsEmail,
   IsDate,
+  IsOptional,
 } from 'class-validator';
 import { Exclude, Expose, Transform } from 'class-transformer';
 
@@ -29,9 +30,11 @@ export class FindUserDto {
 
   @Expose()
   @IsDate()
-  createdAt: Date;
+  @IsOptional()
+  createdAt?: Date;
 
   @Expose()
   @IsDate()
-  updatedAt: Date;
+  @IsOptional()
+  updatedAt?: Date;
 }

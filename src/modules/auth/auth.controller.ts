@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto';
+import { LoginDto, LoginPayloadDto } from './dto';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto, FindUserDto } from '../users/dto';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -31,7 +31,13 @@ export class AuthController {
       forbidNonWhitelisted: true,
     }),
   )
-  async login(@Body() loginDto: LoginDto) {
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: LoginPayloadDto,
+  })
+  async login(@Body() loginDto: LoginDto): Promise<LoginPayloadDto> {
     return this.authService.login(loginDto);
   }
 
