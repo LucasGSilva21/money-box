@@ -8,9 +8,11 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto';
+import { CreateUserDto, FindUserDto } from '../users/dto';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -35,6 +37,12 @@ export class AuthController {
       forbidNonWhitelisted: true,
     }),
   )
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+    type: FindUserDto,
+  })
   async register(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
