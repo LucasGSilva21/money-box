@@ -30,19 +30,6 @@ describe('UsersController', () => {
     });
   });
 
-  describe('Create', () => {
-    it('should return an user when send correct values', async () => {
-      const user = await controller.create({
-        name: 'valid_name',
-        email: 'valid_email@mail.com',
-        password: 'valid_password',
-      });
-      expect(user).toHaveProperty('id');
-      expect(user.name).toEqual('valid_name');
-      expect(user.email).toEqual('valid_email@mail.com');
-    });
-  });
-
   describe('Find All', () => {
     it('should return a void list', async () => {
       const users = await controller.findAll();
