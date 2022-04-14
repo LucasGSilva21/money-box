@@ -51,6 +51,20 @@ describe('AuthController', () => {
       expect(user.name).toEqual('valid_name');
       expect(user.email).toEqual('valid_email@mail.com');
     });
+
+    it('should not create an user if the email already exists', async () => {
+      await controller.register({
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      });
+      const promise = controller.register({
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      });
+      await expect(promise).rejects.toThrow();
+    });
   });
 
   it('should be defined', () => {
