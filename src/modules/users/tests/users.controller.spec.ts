@@ -7,10 +7,21 @@ import {
   rootMongooseTestModule,
   closeInMongodConnection,
 } from '../../../common/helpers/mongoose-test-module';
+import { CryptographyHelper } from '../../../common/helpers/cryptography.helper';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let userService: UsersService;
+
+  class CryptographyHelperFake {
+    public hash(): Promise<string> {
+      return new Promise((resolve) => resolve('any_hash'));
+    }
+
+    public compare(): Promise<boolean> {
+      return new Promise((resolve) => resolve(true));
+    }
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +30,10 @@ describe('UsersController', () => {
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
       ],
       controllers: [UsersController],
-      providers: [UsersService],
+      providers: [
+        UsersService,
+        { provide: CryptographyHelper, useClass: CryptographyHelperFake },
+      ],
     }).compile();
 
     userService = module.get<UsersService>(UsersService);

@@ -1,14 +1,15 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
+import { CryptographyHelper } from '../../common/helpers/cryptography.helper';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly cryptographyHelper: CryptographyHelper,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
@@ -20,7 +21,7 @@ export class UsersService {
       throw new ConflictException('This email already exists');
     }
 
-    const hashPassword = await bcrypt.hash(password, 10);
+    const hashPassword = await this.cryptographyHelper.hash(password);
 
     return this.userModel.create({
       name,
