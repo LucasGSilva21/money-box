@@ -9,6 +9,7 @@ import {
   rootMongooseTestModule,
   closeInMongodConnection,
 } from '../../../common/helpers/mongoose-test-module';
+import { CryptographyHelper } from '../../../common/helpers/cryptography.helper';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -16,6 +17,16 @@ describe('AuthController', () => {
   class JwtServiceFake {
     public sign(): string {
       return 'any_token';
+    }
+  }
+
+  class CryptographyHelperFake {
+    public hash(): Promise<string> {
+      return new Promise((resolve) => resolve('any_hash'));
+    }
+
+    public compare(): Promise<boolean> {
+      return new Promise((resolve) => resolve(true));
     }
   }
 
@@ -30,6 +41,7 @@ describe('AuthController', () => {
         AuthService,
         UsersService,
         { provide: JwtService, useClass: JwtServiceFake },
+        { provide: CryptographyHelper, useClass: CryptographyHelperFake },
       ],
     }).compile();
 
@@ -64,6 +76,21 @@ describe('AuthController', () => {
         password: 'valid_password',
       });
       await expect(promise).rejects.toThrow();
+    });
+  });
+
+  describe('Login', () => {
+    it('should return a access token', async () => {
+      await controller.register({
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      });
+      const loginPayload = await controller.login({
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      });
+      expect(loginPayload).toHaveProperty('access_token');
     });
   });
 

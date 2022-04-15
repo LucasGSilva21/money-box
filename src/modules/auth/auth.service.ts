@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import { CryptographyHelper } from '../../common/helpers/cryptography.helper';
 import { UsersService } from '../users/users.service';
 import { LoginDto, UpdatePasswordDto, LoginPayloadDto } from './dto';
 
@@ -9,6 +9,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly cryptographyHelper: CryptographyHelper,
   ) {}
 
   async login(loginDto: LoginDto): Promise<LoginPayloadDto> {
@@ -16,7 +17,9 @@ export class AuthService {
       email: loginDto.email,
     });
 
-    if (!(await bcrypt.compare(loginDto.password, user.password))) {
+    if (
+      !(await this.cryptographyHelper.compare(loginDto.password, user.password))
+    ) {
       throw new UnauthorizedException();
     }
 
@@ -35,7 +38,12 @@ export class AuthService {
   async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
     const { password } = await this.usersService.findOne({ _id: id });
 
-    if (!(await bcrypt.compare(updatePasswordDto.oldPassword, password))) {
+    if (
+      !(await this.cryptographyHelper.compare(
+        updatePasswordDto.oldPassword,
+        password,
+      ))
+    ) {
       throw new UnauthorizedException();
     }
 

@@ -8,6 +8,7 @@ import {
   rootMongooseTestModule,
   closeInMongodConnection,
 } from '../../../common/helpers/mongoose-test-module';
+import { CryptographyHelper } from '../../../common/helpers/cryptography.helper';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -15,6 +16,16 @@ describe('AuthService', () => {
   class JwtServiceFake {
     public sign(): string {
       return 'any_token';
+    }
+  }
+
+  class CryptographyHelperFake {
+    public hash(): Promise<string> {
+      return new Promise((resolve) => resolve('any_hash'));
+    }
+
+    public compare(): Promise<boolean> {
+      return new Promise((resolve) => resolve(true));
     }
   }
 
@@ -28,6 +39,7 @@ describe('AuthService', () => {
         AuthService,
         UsersService,
         { provide: JwtService, useClass: JwtServiceFake },
+        { provide: CryptographyHelper, useClass: CryptographyHelperFake },
       ],
     }).compile();
 
